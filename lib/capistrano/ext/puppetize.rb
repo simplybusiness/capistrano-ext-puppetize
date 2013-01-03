@@ -33,13 +33,16 @@ FILESERVER
  --fileserverconfig=#{puppet_d}/fileserver.conf \\
  #{puppet_d}/manifests/site.pp
 P_APPLY
-      
-      # We also write /etc/puppet/vagrant-apply which runs puppet
+      run "chmod a+x /etc/puppet/apply"
+      run "sudo /etc/puppet/apply"
+    end
+    task :install_vagrant do
+      # For testing under Vagrant/VirtualBox we can also write 
+      # /etc/puppet/vagrant-apply which runs puppet
       # using files in the /vagrant directory.  On vagrant+virtualbox
       # deployments this is a shared directory which maps onto the
       # host's project checkout area, so puppet tweaks can be made and
       # tested locally without pushing each change to github.
-      
       test_d="/vagrant/config/puppet"
       put(<<V_FILESERVER,"/tmp/fileserver.conf")
 [files]
@@ -59,8 +62,7 @@ V_FILESERVER
  #{test_d}/manifests/site.pp
 V_APPLY
       
-      run "chmod a+x /etc/puppet/apply /etc/puppet/vagrant-apply"
-      run "sudo /etc/puppet/apply"
+      run "chmod a+x /etc/puppet/vagrant-apply"
     end
   end
 end
