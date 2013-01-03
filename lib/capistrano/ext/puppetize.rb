@@ -1,17 +1,8 @@
-# This is not at all Chopin-specific code and is prime candidate for
-# moving into its own gem as soon as anyone else wants to use it
-
 Capistrano::Configuration.instance(:must_exist).load do
   before "deploy:finalize_update", "puppet:install"
   namespace :puppet do
     desc "Install and run puppet manifests"
     task :install do
-      if fetch(:enable_puppet,false)
-        really_install
-      end
-    end
-
-    task :really_install do
       # Export capistrano variables as Puppet facts so that the
       # site.pp manifest can make decisions on what to install based
       # on its role and environment.  We only export string variables
