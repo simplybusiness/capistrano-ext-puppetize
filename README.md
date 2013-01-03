@@ -43,10 +43,10 @@ set :rvm_ruby_string, '1.9.3-p194'
 set :bundle_cmd, "rvm #{rvm_ruby_string} do bundle" 
 ````
 
-1. Likewise for other commands that need to run rvm
-
-    set :unicorn_command, "rvm #{rvm_ruby_string} do bundle exec unicorn_rails"
-
+1. Likewise for other commands that need to run in the context ot rvm
+````
+set :unicorn_command, "rvm #{rvm_ruby_string} do bundle exec unicorn_rails"
+````
 1. A convenient way of installing RVM using Puppet is to use the puppet module at https://github.com/jfryman/puppet-rvm
 
 
