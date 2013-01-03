@@ -1,6 +1,6 @@
 # capistrano-ext-puppetize
 
-A Capistrano extension to upload and run Puppet manifests from the application repository before deploying the application.  This means that all third party daemons, configs, services, libraries and other dependencies of an application can be specified by that application.
+A Capistrano extension to run Puppet manifests contained in the application repository before deploying the application.  This means that all third party daemons, configs, services, libraries and other dependencies of an application can be specified by that application.
 
 
 ## Where it fits in the boostrapping picture
