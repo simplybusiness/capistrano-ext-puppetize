@@ -9,9 +9,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       # -- not class instances, procs, and other outlandish values
 
       # Check puppet is actually installed...
-      unless  capture("test -e /etc/puppet/ && echo 'installed'").strip == 'installed'
-        abort "Error: It looks like Puppet is not installed. Aborting" 
-      end
+      capture("test -e /etc/puppet/ && echo 'installed'").strip == 'installed' or
+      abort "Error: It looks like Puppet is not installed. Aborting"
 
       app_host_name = fetch(:app_host_name) # force this one
       facts = variables.find_all { |k, v| v.is_a?(String) }.
