@@ -8,6 +8,10 @@ Capistrano::Configuration.instance(:must_exist).load do
       # on its role and environment.  We only export string variables
       # -- not class instances, procs, and other outlandish values
 
+      # Check puppet is actually installed...
+      capture("test -e /etc/puppet/ && echo 'installed'").strip == 'installed' or
+      abort "Error: It looks like Puppet is not installed. Aborting"
+
       app_host_name = fetch(:app_host_name) # force this one
       facts = variables.find_all { |k, v| v.is_a?(String) }.
         map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
