@@ -7,10 +7,10 @@ Capistrano::Configuration.instance(:must_exist).load do
       # site.pp manifest can make decisions on what to install based
       # on its role and environment.  We only export string variables
       # -- not class instances, procs, and other outlandish values
+      puppet_location = fetch(:puppet_install_dir, "/etc/puppet/apply")
 
-      # Check puppet is actually installed...
-      capture("test -e /etc/puppet/ && echo 'installed'").strip == 'installed' or
-      abort "Error: It looks like Puppet is not installed. Aborting"
+      capture("test -e #{puppet_location} && echo 'installed'").strip == 'installed' or
+      abort "Error: It looks like Puppet location does not exist. Aborting"
 
       app_host_name = fetch(:app_host_name) # force this one
       facts = variables.find_all { |k, v| v.is_a?(String) }.
@@ -18,7 +18,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         join(" ")
 
       # create puppet/fileserver.conf pointing to the current release
-      puppet_d= fetch(:puppet_modules_location, "#{current_release}/config/puppet") 
+      puppet_d= fetch(:puppet_modules_location, "#{current_release}/config/puppet")
       put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
 [files]
   path #{puppet_d}/files
@@ -26,10 +26,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 [root]
   path #{current_release}\n  allow 127.0.0.1
 FILESERVER
-      
-      # A puppet run can be started at any time by running #{puppet_install_dir}
-      puppet_location = fetch(:puppet_install_dir, "/etc/puppet/apply")
-      
+
       put(<<P_APPLY, "#{puppet_location}")
 #!/bin/sh
 #{facts} puppet apply \\
@@ -42,7 +39,7 @@ P_APPLY
       run "sudo #{puppet_location}"
     end
     task :install_vagrant do
-      # For testing under Vagrant/VirtualBox we can also write 
+      # For testing under Vagrant/VirtualBox we can also write
       # /etc/puppet/vagrant-apply which runs puppet
       # using files in the /vagrant directory.  On vagrant+virtualbox
       # deployments this is a shared directory which maps onto the
@@ -66,7 +63,7 @@ V_FILESERVER
  --fileserverconfig=/tmp/fileserver.conf  \\
  #{test_d}/manifests/site.pp
 V_APPLY
-      
+
       run "chmod a+x /etc/puppet/vagrant-apply"
     end
   end
