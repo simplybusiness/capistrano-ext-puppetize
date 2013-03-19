@@ -7,10 +7,16 @@ Capistrano::Configuration.instance(:must_exist).load do
       # site.pp manifest can make decisions on what to install based
       # on its role and environment.  We only export string variables
       # -- not class instances, procs, and other outlandish values
+      puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
 
-      # Check puppet is actually installed...
-      capture("test -e /etc/puppet/ && echo 'installed'").strip == 'installed' or
-      abort "Error: It looks like Puppet is not installed. Aborting"
+      results = []
+      invoke_command("if [ -e '#{puppet_location}' ]; then echo -n 'true'; fi") do |ch, stream, out|
+        results << (out == 'true')
+      end
+
+      unless results == [true]
+        abort "Error: It looks like puppet location '#{puppet_location}' does not exist. Aborting"
+      end
 
       app_host_name = fetch(:app_host_name) # force this one
       facts = variables.find_all { |k, v| v.is_a?(String) }.
@@ -18,7 +24,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         join(" ")
 
       # create puppet/fileserver.conf pointing to the current release
-      puppet_d="#{current_release}/config/puppet"
+      puppet_d= fetch(:puppet_modules_location, "#{current_release}/config/puppet")
       put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
 [files]
   path #{puppet_d}/files
@@ -26,10 +32,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 [root]
   path #{current_release}\n  allow 127.0.0.1
 FILESERVER
-      
-      # A puppet run can be started at any time by running /etc/puppet/apply
-      
-      put(<<P_APPLY, "/etc/puppet/apply")
+
+      put(<<P_APPLY, "#{puppet_location}/apply")
 #!/bin/sh
 #{facts} puppet apply \\
  --modulepath=#{puppet_d}/modules:#{puppet_d}/vendor/modules \\
@@ -37,11 +41,11 @@ FILESERVER
  --fileserverconfig=#{puppet_d}/fileserver.conf \\
  #{puppet_d}/manifests/site.pp
 P_APPLY
-      run "chmod a+x /etc/puppet/apply"
-      run "sudo /etc/puppet/apply"
+      run "chmod a+x #{puppet_location}/apply"
+      run "sudo #{puppet_location}/apply"
     end
     task :install_vagrant do
-      # For testing under Vagrant/VirtualBox we can also write 
+      # For testing under Vagrant/VirtualBox we can also write
       # /etc/puppet/vagrant-apply which runs puppet
       # using files in the /vagrant directory.  On vagrant+virtualbox
       # deployments this is a shared directory which maps onto the
@@ -65,7 +69,7 @@ V_FILESERVER
  --fileserverconfig=/tmp/fileserver.conf  \\
  #{test_d}/manifests/site.pp
 V_APPLY
-      
+
       run "chmod a+x /etc/puppet/vagrant-apply"
     end
   end
