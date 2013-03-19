@@ -61,7 +61,7 @@ P_APPLY
   allow 127.0.0.1
 V_FILESERVER
 
-      put(<<V_APPLY, "/etc/puppet/vagrant-apply")
+      put(<<V_APPLY, "#{puppet_location}/vagrant-apply")
 #!/bin/sh
 #{facts} puppet apply \\
  --modulepath=#{test_d}/modules:#{test_d}/vendor/modules \\
@@ -70,7 +70,7 @@ V_FILESERVER
  #{test_d}/manifests/site.pp
 V_APPLY
 
-      run "chmod a+x /etc/puppet/vagrant-apply"
+      run "chmod a+x #{puppet_location}/vagrant-apply"
     end
   end
 end
