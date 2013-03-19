@@ -7,7 +7,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       # site.pp manifest can make decisions on what to install based
       # on its role and environment.  We only export string variables
       # -- not class instances, procs, and other outlandish values
-      puppet_location = fetch(:puppet_install_dir, "/etc/puppet/apply")
+      puppet_location = fetch(:puppet_install_dir, "/etc/puppet/")
 
       capture("test -e #{puppet_location} && echo 'installed'").strip == 'installed' or
       abort "Error: It looks like Puppet location does not exist. Aborting"
@@ -27,7 +27,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   path #{current_release}\n  allow 127.0.0.1
 FILESERVER
 
-      put(<<P_APPLY, "#{puppet_location}")
+      put(<<P_APPLY, "#{puppet_location}/apply")
 #!/bin/sh
 #{facts} puppet apply \\
  --modulepath=#{puppet_d}/modules:#{puppet_d}/vendor/modules \\
@@ -35,8 +35,8 @@ FILESERVER
  --fileserverconfig=#{puppet_d}/fileserver.conf \\
  #{puppet_d}/manifests/site.pp
 P_APPLY
-      run "chmod a+x #{puppet_location}"
-      run "sudo #{puppet_location}"
+      run "chmod a+x #{puppet_location}/apply"
+      run "sudo #{puppet_location}/apply"
     end
     task :install_vagrant do
       # For testing under Vagrant/VirtualBox we can also write
