@@ -18,7 +18,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         join(" ")
 
       # create puppet/fileserver.conf pointing to the current release
-      puppet_d="#{current_release}/config/puppet"
+      puppet_d= fetch(:puppet_modules_location) || "#{current_release}/config/puppet"
       put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
 [files]
   path #{puppet_d}/files
@@ -27,9 +27,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   path #{current_release}\n  allow 127.0.0.1
 FILESERVER
       
-      # A puppet run can be started at any time by running /etc/puppet/apply
+      # A puppet run can be started at any time by running #{puppet_install_dir}
+      puppet_install_dir = fetch(:puppet_install_dir) || "#{puppet_install_dir}"
       
-      put(<<P_APPLY, "/etc/puppet/apply")
+      put(<<P_APPLY, "#{puppet_install_dir}")
 #!/bin/sh
 #{facts} puppet apply \\
  --modulepath=#{puppet_d}/modules:#{puppet_d}/vendor/modules \\
@@ -37,8 +38,8 @@ FILESERVER
  --fileserverconfig=#{puppet_d}/fileserver.conf \\
  #{puppet_d}/manifests/site.pp
 P_APPLY
-      run "chmod a+x /etc/puppet/apply"
-      run "sudo /etc/puppet/apply"
+      run "chmod a+x #{puppet_install_dir}"
+      run "sudo #{puppet_install_dir}"
     end
     task :install_vagrant do
       # For testing under Vagrant/VirtualBox we can also write 
