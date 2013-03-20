@@ -18,7 +18,15 @@ Capistrano::Configuration.instance(:must_exist).load do
         abort "Error: It looks like puppet location '#{puppet_location}' does not exist. Aborting"
       end
 
-      app_host_name = fetch(:app_host_name) # force this one
+      generated_host_name = ""
+
+      if (exists?(:stage)
+        generated_host_name = "#{fetch(:stage}-#{:application}"
+      else
+        generated_host_name = "#{fetch(:application}"
+      else
+
+      app_host_name = fetch(:app_host_name, "#{generated_host_name}") 
       facts = variables.find_all { |k, v| v.is_a?(String) }.
         map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
         join(" ")
