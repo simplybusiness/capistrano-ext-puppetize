@@ -21,9 +21,9 @@ Capistrano::Configuration.instance(:must_exist).load do
       generated_host_name = ""
 
       if (exists?(:stage)
-        generated_host_name = "#{fetch(:stage}-#{:application}"
+        generated_host_name = "#{fetch(:stage)}-#{fetch(:application)}"
       else
-        generated_host_name = "#{fetch(:application}"
+        generated_host_name = "#{fetch(:application)}"
       else
 
       app_host_name = fetch(:app_host_name, "#{generated_host_name}") 
