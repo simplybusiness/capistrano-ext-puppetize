@@ -20,11 +20,11 @@ Capistrano::Configuration.instance(:must_exist).load do
 
       generated_host_name = ""
 
-      if (exists?(:stage)
+      if (exists?(:stage))
         generated_host_name = "#{fetch(:stage)}-#{fetch(:application)}"
       else
         generated_host_name = "#{fetch(:application)}"
-      else
+      end
 
       app_host_name = fetch(:app_host_name, "#{generated_host_name}") 
       facts = variables.find_all { |k, v| v.is_a?(String) }.
