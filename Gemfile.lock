@@ -4,8 +4,6 @@ PATH
     capistrano-ext-puppetize (0.2.1)
       capistrano (>= 2.0.0)
       capistrano-ext
-      capistrano-spec
-      rspec
 
 GEM
   remote: https://www.rubygems.org/
@@ -42,3 +40,5 @@ PLATFORMS
 
 DEPENDENCIES
   capistrano-ext-puppetize!
+  capistrano-spec
+  rspec
