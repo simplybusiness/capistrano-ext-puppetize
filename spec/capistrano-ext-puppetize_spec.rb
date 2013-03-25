@@ -23,6 +23,10 @@ describe Capistrano::Puppetize, "loaded into a configuration" do
       @configuration.find_task('puppet:install').should_not eql nil
     end
 
+    it "performs puppet:install before deploy:finalize_update" do
+      @configuration.should callback('puppet:install').before('deploy:finalize_update')
+    end
+
   end
 
 end

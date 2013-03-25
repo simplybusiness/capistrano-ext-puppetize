@@ -14,8 +14,7 @@ require 'capistrano-spec'
 require 'rspec'
 require 'rspec/autorun'
 
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
-
 RSpec.configure do |config|
-  
+  config.include Capistrano::Spec::Matchers
+  config.include Capistrano::Spec::Helpers
 end
