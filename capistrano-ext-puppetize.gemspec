@@ -14,8 +14,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'capistrano', '>=2.0.0'
   spec.add_dependency 'capistrano-ext'
-  spec.add_dependency 'capistrano-spec'
-  spec.add_dependency 'rspec'
+
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'capistrano-spec'
 
   spec.require_path = 'lib'
 end
