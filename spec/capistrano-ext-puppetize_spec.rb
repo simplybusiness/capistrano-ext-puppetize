@@ -27,6 +27,12 @@ describe Capistrano::Puppetize, "loaded into a configuration" do
       @configuration.should callback('puppet:install').before('deploy:finalize_update')
     end
 
+    it 'should create the puppet file and run it' do
+      @configuration.find_and_execute_task('puppet:install')
+      @configuration.should have_run("chmod a+x /etc/puppet/apply")
+      @configuration.should have_run("sudo /etc/puppet/apply")
+    end
+
   end
 
 end
