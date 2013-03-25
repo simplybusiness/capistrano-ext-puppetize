@@ -16,10 +16,10 @@ describe Capistrano::Puppetize, "loaded into a configuration" do
       @configuration.set(:stage, "staging")
       @configuration.set(:current_release, "/for/bar/current")
       @configuration.set(:app_host_name, "Helios")
-      @configuration.find_and_execute_task('puppet:install')
     end
 
     it "defines puppet:install" do
+      @configuration.find_and_execute_task('puppet:install')
       @configuration.find_task('puppet:install').should_not eql nil
     end
 
