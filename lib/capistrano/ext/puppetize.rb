@@ -11,12 +11,12 @@ module Capistrano
             # site.pp manifest can make decisions on what to install based
             # on its role and environment.  We only export string variables
             # -- not class instances, procs, and other outlandish values
-            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
-            app_host_name = fetch(:app_host_name) #force this for now
-  
             facts = variables.find_all { |k, v| v.is_a?(String) }.
             map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
             join(" ")
+
+            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
+            app_host_name = fetch(:app_host_name) #force this for now
   
             # create puppet/fileserver.conf from given puppet file location
             puppet_d= fetch(:puppet_files_location, "#{current_release}/config/puppet")
