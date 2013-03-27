@@ -12,7 +12,6 @@ module Capistrano
             # on its role and environment.  We only export string variables
             # -- not class instances, procs, and other outlandish values
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
-  
             app_host_name = fetch(:app_host_name) #force this for now
   
             facts = variables.find_all { |k, v| v.is_a?(String) }.
@@ -28,7 +27,7 @@ module Capistrano
 [root]
   path #{current_release}\n  allow 127.0.0.1
 FILESERVER
-
+            # A puppet run can be started at any time by running the created puppet file (eg. /etc/puppet/apply)
             put(<<P_APPLY, "#{puppet_location}/apply")
 #!/bin/sh
 #{facts} puppet apply \\
