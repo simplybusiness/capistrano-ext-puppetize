@@ -15,6 +15,9 @@ require 'rspec'
 require 'rspec/autorun'
 
 RSpec.configure do |config|
+  config.color_enabled = true
+  config.tty = true
+  config.formatter = :documentation
   config.include Capistrano::Spec::Matchers
   config.include Capistrano::Spec::Helpers
 end
