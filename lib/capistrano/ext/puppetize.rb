@@ -19,7 +19,7 @@ module Capistrano
             app_host_name = fetch(:app_host_name) #force this for now
   
             # create puppet/fileserver.conf from given puppet file location
-            puppet_d= fetch(:puppet_files_location, "#{current_release}/config/puppet")
+            puppet_d= fetch(:project_puppet_dir, "#{current_release}/config/puppet")
             put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
 [files]
   path #{puppet_d}/files
