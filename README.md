@@ -16,7 +16,11 @@ At the top of `Capfile` or `config/deploy.rb` add the line
 ````
 require "capistrano/ext/puppetize"
 ````
-This will define a Capistrano recipe `puppet:install` and hook it to run before `deploy:finalize_update`.  When the recipe runs it will cause the creation and execution of a file `/etc/puppet/apply` on the target machine which runs Puppet in standalone (masterless) mode with a slew of appropriate parameters and options:
+This will define a Capistrano recipe `puppet:install` and hook it to run before `deploy:finalize_update`.  
+
+### What it does
+
+By default, when the recipe runs it will cause the creation and execution of a file `/etc/puppet/apply` on the target machine which runs Puppet in standalone (masterless) mode with a slew of appropriate parameters and options:
 
 * the puppet manifest in `config/puppet/manifests/site.pp` is run
 
@@ -31,6 +35,19 @@ This will define a Capistrano recipe `puppet:install` and hook it to run before 
 
 The file `/etc/puppet/apply` is a perfectly ordinary shell script which can also be run at other times (e.g. unattended at boot, or from cron) to ensure that the system state is correct without having to do a deploy.
 
+NOTE: These paths will be different if you have specified custom parameters in the `deploy.rb` file (See below)
+
+### Customising parameters
+
+You can specify options for your project but adding the following to the deploy.rb:
+```ruby
+set :project_puppet_dir, "foo/bar/"
+#Default location if not set: #{current_release}/config/puppet/
+
+To specify where to put the puppet executable `apply` file
+set :puppet_install_dir, "/opt/scripts/puppet"
+#Default location if not set: /etc/puppet/
+```
 
 ### Living with RVM
 
