@@ -1,6 +1,12 @@
 require 'capistrano'
 module Capistrano
   module Puppetize
+    def self.load_facts(variables)
+      variables.find_all { |k, v| v.is_a?(String) }.
+        map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
+      join(" ")
+    end
+
     def self.load_into(configuration)
       configuration.load do
         before "deploy:finalize_update", "puppet:install"
@@ -12,12 +18,10 @@ module Capistrano
             # on its role and environment.  We only export string variables
             # -- not class instances, procs, and other outlandish values
             app_host_name = fetch(:app_host_name) #force this for now
-            facts = variables.find_all { |k, v| v.is_a?(String) }.
-            map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
-            join(" ")
+            facts = Puppetize.load_facts(variables)
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
-  
+
             # create puppet/fileserver.conf from given puppet file location
             puppet_d= fetch(:project_puppet_dir, "#{current_release}/config/puppet")
             put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
@@ -46,6 +50,10 @@ P_APPLY
             # deployments this is a shared directory which maps onto the
             # host's project checkout area, so puppet tweaks can be made and
             # tested locally without pushing each change to github.
+            app_host_name = fetch(:app_host_name) #force this for now
+            facts = Puppetize.load_facts(variables)
+
+            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
             test_d="/vagrant/config/puppet"
             put(<<V_FILESERVER,"/tmp/fileserver.conf")
 [files]
@@ -66,6 +74,7 @@ V_FILESERVER
 V_APPLY
 
             run "chmod a+x #{puppet_location}/vagrant-apply"
+            run "sudo #{puppet_location}/vagrant-apply"
           end
         end
       end
