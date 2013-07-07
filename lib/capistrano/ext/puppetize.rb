@@ -10,14 +10,19 @@ module Capistrano
     def self.load_into(configuration)
       configuration.load do
         before "deploy:finalize_update", "puppet:install"
+
+        def self.preload_exported_puppet_vars
+          Array(fetch(:exported_to_puppet, [])).map { |k| fetch(k) }
+        end
+
         namespace :puppet do
           desc "Install and run puppet manifests"
           task :install do
+            preload_exported_puppet_vars
             # Export capistrano variables as Puppet facts so that the
             # site.pp manifest can make decisions on what to install based
             # on its role and environment.  We only export string variables
             # -- not class instances, procs, and other outlandish values
-            app_host_name = fetch(:app_host_name) #force this for now
             facts = Puppetize.load_facts(variables)
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
@@ -44,13 +49,13 @@ P_APPLY
             run "sudo #{puppet_location}/apply"
           end
           task :install_vagrant do
+            preload_exported_puppet_vars
             # For testing under Vagrant/VirtualBox we can also write
             # /etc/puppet/vagrant-apply which runs puppet
             # using files in the /vagrant directory.  On vagrant+virtualbox
             # deployments this is a shared directory which maps onto the
             # host's project checkout area, so puppet tweaks can be made and
             # tested locally without pushing each change to github.
-            app_host_name = fetch(:app_host_name) #force this for now
             facts = Puppetize.load_facts(variables)
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
