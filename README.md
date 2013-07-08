@@ -26,6 +26,8 @@ By default, when the recipe runs it will cause the creation and execution of a f
 
 * all string-valued Capistrano configuration variables will be available as facts, with names prefixed `cap_` - for example, the Capistrano `:deploy_to` setting is available as the Puppet fact `cap_deploy_to`.  Note that this does not cause the evaluation of variables that have not yet been evaluated (otherwise you tend to get annoying password prompts) 
 
+* to get a proc-valued Capistrano configuration variable as a fact, add setting `set :exported_to_puppet, [:name_of_the_var]`
+
 * a fileserver configuration is created such that `puppet:///files/foo` refers to `config/puppet/files/foo` and `puppet:///root/foo` refers to `foo` in the top directory of the project
 
 * the modulepath is set to find modules in `config/puppet/modules` and 
