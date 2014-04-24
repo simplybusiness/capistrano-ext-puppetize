@@ -29,7 +29,8 @@ By default, when the recipe runs it will cause the creation and execution of a f
 * a fileserver configuration is created such that `puppet:///files/foo` refers to `config/puppet/files/foo` and `puppet:///root/foo` refers to `foo` in the top directory of the project
 
 * the modulepath is set to find modules in `config/puppet/modules` and 
-`config/puppet/vendor/modules`
+`config/puppet/vendor/modules`.  If you have other places you
+keep modules, add them to the Capistrano setting `puppet_module_paths`
 
 * the template directory is set to `config/puppet/templates`
 

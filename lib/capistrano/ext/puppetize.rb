@@ -14,6 +14,7 @@ module Capistrano
         }
         @puppet_root = args.fetch(:puppet_root)
         @project_root = args.fetch(:project_root)
+        @module_paths = args.fetch(:module_paths)
       end
 
       def fileserver_conf
@@ -27,12 +28,17 @@ module Capistrano
 FILESERVER
       end
 
+      def all_module_paths
+        @module_paths +
+          [@puppet_root + '/modules',
+           @puppet_root + '/vendor/modules']
+      end
+
       def apply_sh
         <<P_APPLY
 #!/bin/sh
 #{@facts.join(" ")} puppet apply \\
- --modulepath=#{[@puppet_root + '/modules',
-                 @puppet_root + '/vendor/modules'].join(':')} \\
+ --modulepath=#{all_module_paths.join(':')} \\
  --templatedir=#{@puppet_root}/templates \\
  --fileserverconfig=#{@puppet_root}/fileserver.conf \\
  #{@puppet_root}/manifests/site.pp
@@ -50,7 +56,8 @@ P_APPLY
             app_host_name = fetch(:app_host_name) #force this for now
             puppet_conf = Config.new(variables: variables,
                                      puppet_root: fetch(:project_puppet_dir, "#{current_release}/config/puppet"),
-                                     project_root: fetch(:current_release))
+                                     project_root: fetch(:current_release),
+                                     module_paths: fetch(:puppet_module_paths, []))
 
             install_dir = fetch(:puppet_install_dir, "/etc/puppet")
 
@@ -71,7 +78,8 @@ P_APPLY
 
             puppet_conf = Config.new(variables: variables,
                                      puppet_root: "/vagrant/config/puppet",
-                                     project_root: "/vagrant")
+                                     project_root: "/vagrant",
+                                     module_paths: fetch(:puppet_module_paths, []))
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
 
