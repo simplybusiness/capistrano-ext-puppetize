@@ -7,7 +7,7 @@ A Capistrano extension to run Puppet manifests contained in the application repo
 
 It requires that the host(s) deployed onto already has installed Puppet and a version of Ruby capable of running it: at Simply Business we install the CentOS system Ruby and the Puppet RPMs from Puppet Labs in our base image/AMIs
 
-It doesn't need RVM installed beforehand - we usually use it to install RVM and the application-specific Ruby.
+It doesn't need RVM installed beforehand - we don't use RVM (or anything like it) on our production machines, but when we did, we would usually use this module to install RVM and the application-specific Ruby.
 
 
 ## How to use it 
@@ -70,3 +70,4 @@ set :whenever_command, "#{fetch(:bundle_cmd)} exec whenever"
 1. A convenient way of installing RVM using Puppet is to use the puppet module at https://github.com/jfryman/puppet-rvm
 
 
+Side note: there is an Internet rule that any request for advice on how to do X can be fulfilled by the simple admonition "Don't do X", and that this reply must be accepted regardless of the value of X.  Although unconvinced that this is, in general, How Things Should Be, when X is "RVM on production systems" a strong case could be made for its observance.  Really, why are you deploying more than one version of Ruby to the same production system? 
