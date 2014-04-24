@@ -68,27 +68,17 @@ P_APPLY
             # host's project checkout area, so puppet tweaks can be made and
             # tested locally without pushing each change to github.
             app_host_name = fetch(:app_host_name) #force this for now
-            facts = Puppetize.load_facts(variables)
+
+            puppet_conf = Config.new(variables: variables,
+                                     puppet_root: "/vagrant/config/puppet",
+                                     project_root: "/vagrant")
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
-            test_d="/vagrant/config/puppet"
-            put(<<V_FILESERVER,"/tmp/fileserver.conf")
-[files]
-  path #{test_d}/files
-  allow 127.0.0.1
-[root]
-  path /vagrant
-  allow 127.0.0.1
-V_FILESERVER
 
-            put(<<V_APPLY, "#{puppet_location}/vagrant-apply")
-#!/bin/sh
-#{facts} puppet apply \\
- --modulepath=#{test_d}/modules:#{test_d}/vendor/modules \\
- --templatedir=#{test_d}/templates  \\
- --fileserverconfig=/tmp/fileserver.conf  \\
- #{test_d}/manifests/site.pp
-V_APPLY
+            put(puppet_conf.fileserver_conf, "/tmp/fileserver.conf")
+            v_apply = puppet_conf.apply_sh.sub(/(--fileserverconfig)=(.+)\n/,
+                                               '\1=/tmp/fileserver.conf')
+            put(v_apply, "#{puppet_location}/vagrant-apply")
 
             run "chmod a+x #{puppet_location}/vagrant-apply"
             run "sudo #{puppet_location}/vagrant-apply"
