@@ -36,6 +36,18 @@ describe Capistrano::Puppetize, "loaded into a configuration" do
 end
 
 describe Capistrano::Puppetize::Config do
+  it 'complains if required args are missing' do
+    values = {
+      variables: {},
+      project_root: "/home/runner/app/current/",
+      module_paths: ["/etc/puppet/modules",
+                     "/tmp/modules"]
+    }
+    expect {
+      Capistrano::Puppetize::Config.new(values)
+    }.to raise_error KeyError
+  end
+
   it 'supports customizing the module path' do
     values = {
       variables: {black: "white",
