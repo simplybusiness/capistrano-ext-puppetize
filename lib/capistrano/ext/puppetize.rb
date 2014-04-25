@@ -40,7 +40,7 @@ FILESERVER
 #{@facts.join(" ")} puppet apply \\
  --modulepath=#{all_module_paths.join(':')} \\
  --templatedir=#{@puppet_root}/templates \\
- --fileserverconfig=#{@puppet_root}/fileserver.conf \\
+ --fileserverconfig=#{@install_dir}/fileserver.conf \\
  #{@puppet_root}/manifests/site.pp
 P_APPLY
 
@@ -54,12 +54,14 @@ P_APPLY
           desc "Install and run puppet manifests"
           task :install do
             app_host_name = fetch(:app_host_name) #force this for now
+            install_dir = fetch(:puppet_install_dir, "/etc/puppet")
             puppet_conf = Config.new(variables: variables,
                                      puppet_root: fetch(:project_puppet_dir, "#{current_release}/config/puppet"),
                                      project_root: fetch(:current_release),
+                                     install_dir: install_dir,
                                      module_paths: fetch(:puppet_module_paths, []))
 
-            install_dir = fetch(:puppet_install_dir, "/etc/puppet")
+
 
             put(puppet_conf.fileserver_conf, "#{install_dir}/fileserver.conf")
             put(puppet_conf.apply_sh, "#{install_dir}/apply")
@@ -76,12 +78,12 @@ P_APPLY
             # tested locally without pushing each change to github.
             app_host_name = fetch(:app_host_name) #force this for now
 
+            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
             puppet_conf = Config.new(variables: variables,
                                      puppet_root: "/vagrant/config/puppet",
                                      project_root: "/vagrant",
+                                     install_dir: puppet_location,
                                      module_paths: fetch(:puppet_module_paths, []))
-
-            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
 
             put(puppet_conf.fileserver_conf, "/tmp/fileserver.conf")
             v_apply = puppet_conf.apply_sh.sub(/(--fileserverconfig)=(.+)\n/,
