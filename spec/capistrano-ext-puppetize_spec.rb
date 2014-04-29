@@ -64,7 +64,7 @@ describe Capistrano::Puppetize::Config do
     expect(script).to match %{--modulepath=/etc/puppet/modules:/tmp/modules:/home/runner/app/current/config/puppet/modules:/home/runner/app/current/config/puppet/vendor/modules}
   end
 
-  it 'expects fileserver.conf in /etc/puppet' do
+  it 'expects fileserver.conf in the git working tree' do
     values = {
       variables: {starwars: "Dislike",
         wrong: "right",
@@ -76,6 +76,6 @@ describe Capistrano::Puppetize::Config do
     }
     config = Capistrano::Puppetize::Config.new(values)
     script = config.apply_sh
-    expect(script).to match %{--fileserverconfig=/etc/puppet/fileserver.conf}
+    expect(script).to match %{--fileserverconfig=/home/runner/app/current/config/puppet/fileserver.conf}
   end
 end
