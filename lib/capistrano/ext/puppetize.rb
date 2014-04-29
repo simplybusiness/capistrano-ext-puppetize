@@ -56,15 +56,14 @@ P_APPLY
           task :install do
             app_host_name = fetch(:app_host_name) #force this for now
             install_dir = fetch(:puppet_install_dir, "/etc/puppet")
+            puppet_root = fetch(:project_puppet_dir, "#{current_release}/config/puppet")
             puppet_conf = Config.new(variables: variables,
-                                     puppet_root: fetch(:project_puppet_dir, "#{current_release}/config/puppet"),
+                                     puppet_root: puppet_root,
                                      project_root: fetch(:current_release),
                                      install_dir: install_dir,
                                      module_paths: fetch(:puppet_module_paths, []))
 
-
-
-            put(puppet_conf.fileserver_conf, "#{install_dir}/fileserver.conf")
+            put(puppet_conf.fileserver_conf, "#{puppet_root}/fileserver.conf")
             put(puppet_conf.apply_sh, "#{install_dir}/apply")
 
             run "chmod a+x #{install_dir}/apply"
