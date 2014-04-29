@@ -1,10 +1,51 @@
 require 'capistrano'
+
+
 module Capistrano
   module Puppetize
-    def self.load_facts(variables)
-      variables.find_all { |k, v| v.is_a?(String) }.
-        map {|k, v| "FACTER_cap_#{k}=#{v.inspect}" }.
-      join(" ")
+    class Config
+      def initialize(args)
+        # export capistrano variables as Puppet facts so that the
+        # site.pp manifest can make decisions on what to install based
+        # on its role and environment.  We only export string variables
+        # -- not class instances, procs, and other outlandish values
+        @facts = args.fetch(:variables).find_all { |k, v| v.is_a?(String) }.
+          map {|k, v| "FACTER_cap_#{k}=#{v.inspect}"
+        }
+        @puppet_root = args.fetch(:puppet_root)
+        @project_root = args.fetch(:project_root)
+        @module_paths = args.fetch(:module_paths)
+        @install_dir = args.fetch(:install_dir, "/etc/puppet")
+      end
+
+      def fileserver_conf
+        <<FILESERVER
+[files]
+  path #{@puppet_root}/files
+  allow 127.0.0.1
+[root]
+  path #{@project_root}
+  allow 127.0.0.1
+FILESERVER
+      end
+
+      def all_module_paths
+        @module_paths +
+          [@puppet_root + '/modules',
+           @puppet_root + '/vendor/modules']
+      end
+
+      def apply_sh
+        <<P_APPLY
+#!/bin/sh
+#{@facts.join(" ")} puppet apply \\
+ --modulepath=#{all_module_paths.join(':')} \\
+ --templatedir=#{@puppet_root}/templates \\
+ --fileserverconfig=#{@install_dir}/fileserver.conf \\
+ #{@puppet_root}/manifests/site.pp
+P_APPLY
+
+      end
     end
 
     def self.load_into(configuration)
@@ -13,35 +54,21 @@ module Capistrano
         namespace :puppet do
           desc "Install and run puppet manifests"
           task :install do
-            # Export capistrano variables as Puppet facts so that the
-            # site.pp manifest can make decisions on what to install based
-            # on its role and environment.  We only export string variables
-            # -- not class instances, procs, and other outlandish values
             app_host_name = fetch(:app_host_name) #force this for now
-            facts = Puppetize.load_facts(variables)
+            install_dir = fetch(:puppet_install_dir, "/etc/puppet")
+            puppet_conf = Config.new(variables: variables,
+                                     puppet_root: fetch(:project_puppet_dir, "#{current_release}/config/puppet"),
+                                     project_root: fetch(:current_release),
+                                     install_dir: install_dir,
+                                     module_paths: fetch(:puppet_module_paths, []))
 
-            puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
 
-            # create puppet/fileserver.conf from given puppet file location
-            puppet_d= fetch(:project_puppet_dir, "#{current_release}/config/puppet")
-            put(<<FILESERVER, "#{puppet_d}/fileserver.conf")
-[files]
-  path #{puppet_d}/files
-  allow 127.0.0.1
-[root]
-  path #{current_release}\n  allow 127.0.0.1
-FILESERVER
-            # A puppet run can be started at any time by running the created puppet file (eg. /etc/puppet/apply)
-            put(<<P_APPLY, "#{puppet_location}/apply")
-#!/bin/sh
-#{facts} puppet apply \\
- --modulepath=#{puppet_d}/modules:#{puppet_d}/vendor/modules \\
- --templatedir=#{puppet_d}/templates \\
- --fileserverconfig=#{puppet_d}/fileserver.conf \\
- #{puppet_d}/manifests/site.pp
-P_APPLY
-            run "chmod a+x #{puppet_location}/apply"
-            run "sudo #{puppet_location}/apply"
+
+            put(puppet_conf.fileserver_conf, "#{install_dir}/fileserver.conf")
+            put(puppet_conf.apply_sh, "#{install_dir}/apply")
+
+            run "chmod a+x #{install_dir}/apply"
+            run "sudo #{install_dir}/apply"
           end
           task :install_vagrant do
             # For testing under Vagrant/VirtualBox we can also write
@@ -51,27 +78,18 @@ P_APPLY
             # host's project checkout area, so puppet tweaks can be made and
             # tested locally without pushing each change to github.
             app_host_name = fetch(:app_host_name) #force this for now
-            facts = Puppetize.load_facts(variables)
 
             puppet_location = fetch(:puppet_install_dir, "/etc/puppet")
-            test_d="/vagrant/config/puppet"
-            put(<<V_FILESERVER,"/tmp/fileserver.conf")
-[files]
-  path #{test_d}/files
-  allow 127.0.0.1
-[root]
-  path /vagrant
-  allow 127.0.0.1
-V_FILESERVER
+            puppet_conf = Config.new(variables: variables,
+                                     puppet_root: "/vagrant/config/puppet",
+                                     project_root: "/vagrant",
+                                     install_dir: puppet_location,
+                                     module_paths: fetch(:puppet_module_paths, []))
 
-            put(<<V_APPLY, "#{puppet_location}/vagrant-apply")
-#!/bin/sh
-#{facts} puppet apply \\
- --modulepath=#{test_d}/modules:#{test_d}/vendor/modules \\
- --templatedir=#{test_d}/templates  \\
- --fileserverconfig=/tmp/fileserver.conf  \\
- #{test_d}/manifests/site.pp
-V_APPLY
+            put(puppet_conf.fileserver_conf, "/tmp/fileserver.conf")
+            v_apply = puppet_conf.apply_sh.sub(/(--fileserverconfig)=(.+)\n/,
+                                               '\1=/tmp/fileserver.conf')
+            put(v_apply, "#{puppet_location}/vagrant-apply")
 
             run "chmod a+x #{puppet_location}/vagrant-apply"
             run "sudo #{puppet_location}/vagrant-apply"
