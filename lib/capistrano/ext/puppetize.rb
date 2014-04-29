@@ -12,10 +12,9 @@ module Capistrano
         @facts = args.fetch(:variables).find_all { |k, v| v.is_a?(String) }.
           map {|k, v| "FACTER_cap_#{k}=#{v.inspect}"
         }
-        missing_key = proc {|k| raise KeyError,"key not found: #{k.inspect}"}
-        @puppet_root = args.fetch(:puppet_root, &missing_key)
-        @project_root = args.fetch(:project_root, &missing_key)
-        @module_paths = args.fetch(:module_paths, &missing_key)
+        @puppet_root = args.fetch(:puppet_root)
+        @project_root = args.fetch(:project_root)
+        @module_paths = args.fetch(:module_paths)
         @install_dir = args.fetch(:install_dir, "/etc/puppet")
       end
 
