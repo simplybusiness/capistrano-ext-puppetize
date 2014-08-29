@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Capistrano extension to run Puppet manifests contained in the application to be deployed'
   spec.license = 'Simplified BSD'
 
-  spec.add_dependency 'capistrano', '~>2.1'
+  spec.add_dependency 'capistrano', '3.0.0'
   spec.add_dependency 'capistrano-ext'
 
   spec.add_development_dependency 'rspec'
