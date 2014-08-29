@@ -15,7 +15,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'capistrano', '3.1'
 
   spec.add_development_dependency 'rspec'
-  # spec.add_development_dependency 'capistrano-spec'
 
   spec.require_path = 'lib'
 end
