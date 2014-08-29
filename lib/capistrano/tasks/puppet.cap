@@ -1,5 +1,3 @@
-before "deploy:finalize_update", "puppet:install"
-
 namespace :puppet do
   desc "Install and run puppet manifests"
   task :install do
@@ -44,3 +42,5 @@ namespace :puppet do
     run "sudo #{puppet_location}/vagrant-apply"
   end
 end
+
+before "deploy:started", "puppet:install"
