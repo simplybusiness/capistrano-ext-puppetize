@@ -1,6 +1,3 @@
-require 'capistrano'
-
-
 module Capistrano
   module Puppetize
     class Config

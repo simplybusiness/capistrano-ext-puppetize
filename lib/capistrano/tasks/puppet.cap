@@ -4,7 +4,7 @@ namespace :puppet do
     app_host_name = fetch(:app_host_name) #force this for now
     install_dir = fetch(:puppet_install_dir, "/etc/puppet")
     puppet_root = fetch(:project_puppet_dir, "#{current_release}/config/puppet")
-    puppet_conf = Config.new(variables: variables,
+    puppet_conf = Capistrano::Puppetize::Config.new(variables: variables,
                              puppet_root: puppet_root,
                              project_root: fetch(:current_release),
                              install_dir: install_dir,

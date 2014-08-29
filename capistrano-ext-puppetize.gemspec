@@ -1,10 +1,10 @@
 $:.push File.expand_path("../lib", __FILE__)
 
-require 'capistrano/ext/puppetize/version'
+require 'capistrano/puppetize/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'capistrano-ext-puppetize'
-  spec.version = Capistrano::Ext::Puppetize::Version::STRING
+  spec.version = Capistrano::Puppetize::Version::STRING
   spec.platform = Gem::Platform::RUBY
   spec.authors = ['Simply Business']
   spec.email = ['daniel.barlow@simplybusiness.co.uk']
@@ -13,7 +13,6 @@ Gem::Specification.new do |spec|
   spec.license = 'Simplified BSD'
 
   spec.add_dependency 'capistrano', '3.1'
-  spec.add_dependency 'capistrano-ext'
 
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'capistrano-spec'
