@@ -15,7 +15,6 @@ namespace :puppet do
 
       upload!(StringIO.new(puppet_conf.fileserver_conf), "#{puppet_root}/fileserver.conf")
       upload!(StringIO.new(puppet_conf.apply_sh), "#{install_dir}/apply")
-      require 'pry'; binding.pry
       execute :chmod, "a+x #{install_dir}/apply"
       sudo "#{install_dir}/apply"
     end
@@ -42,8 +41,8 @@ namespace :puppet do
                                        '\1=/tmp/fileserver.conf')
     upload!(StringIO.new(v_apply), "#{puppet_location}/vagrant-apply")
 
-    execute "chmod a+x #{puppet_location}/vagrant-apply"
-    execute "sudo #{puppet_location}/vagrant-apply"
+    execute :chmod, "a+x #{puppet_location}/vagrant-apply"
+    sudo "#{puppet_location}/vagrant-apply"
   end
 end
 
