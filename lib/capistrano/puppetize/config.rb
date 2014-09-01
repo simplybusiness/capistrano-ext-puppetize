@@ -6,8 +6,8 @@ module Capistrano
         # site.pp manifest can make decisions on what to install based
         # on its role and environment.  We only export string variables
         # -- not class instances, procs, and other outlandish values
-        @facts = args.fetch(:variables).find_all { |k, v| v.is_a?(String) }.
-          map {|k, v| "FACTER_cap_#{k}=#{v.inspect}"
+        @facts = args.fetch(:variables).find_all { |k, v| [String, Symbol].include? v.class }.
+          map {|k, v| "FACTER_cap_#{k}=#{v.to_s.inspect}"
         }
         @puppet_root = args.fetch(:puppet_root)
         @project_root = args.fetch(:project_root)
