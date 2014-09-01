@@ -46,4 +46,4 @@ namespace :puppet do
   end
 end
 
-before "deploy:finishing", "puppet:install"
+after "deploy:updating", "puppet:install"
