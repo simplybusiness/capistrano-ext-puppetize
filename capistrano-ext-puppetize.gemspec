@@ -17,4 +17,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
 
   spec.require_path = 'lib'
+
+  spec.license = 'MIT'
 end
