@@ -10,13 +10,11 @@ Gem::Specification.new do |spec|
   spec.email = ['daniel.barlow@simplybusiness.co.uk']
   spec.summary = 'Run Puppet manifests in a Capistrano deployment'
   spec.description = 'Capistrano extension to run Puppet manifests contained in the application to be deployed'
-  spec.license = 'Simplified BSD'
+  spec.license = 'MIT'
 
   spec.add_dependency 'capistrano', '3.1'
-
   spec.add_development_dependency 'rspec'
 
   spec.require_path = 'lib'
 
-  spec.license = 'MIT'
 end
