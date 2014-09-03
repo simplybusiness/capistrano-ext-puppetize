@@ -12,6 +12,22 @@ It doesn't need RVM installed beforehand - we don't use RVM (or anything like it
 
 ## How to use it 
 
+### Installation
+
+  Put this in your Gemfile
+  
+#### Capistrano ~>2.1
+```
+gem 'capistrano-ext-puppetize', git: 'git@github.com:simplybusiness/capistrano-ext-puppetize.git', tag: '0.4.0'
+```
+
+#### Capistrano ~>3.1
+```
+gem 'capistrano-ext-puppetize', git: 'git@github.com:simplybusiness/capistrano-ext-puppetize.git', tag: '1.0.0'
+```
+
+### Capfile
+
 At the top of `Capfile` or `config/deploy.rb` add the line
 ````
 require "capistrano/ext/puppetize"
