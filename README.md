@@ -29,9 +29,18 @@ gem 'capistrano-ext-puppetize', git: 'git@github.com:simplybusiness/capistrano-e
 ### Capfile
 
 At the top of `Capfile` or `config/deploy.rb` add the line
-````
-require "capistrano/ext/puppetize"
-````
+
+  
+#### Capistrano ~>2.1
+```
+require 'capistrano/ext/puppetize'
+```
+
+#### Capistrano ~>3.1
+```
+require 'capistrano/puppetize'
+```
+
 This will define a Capistrano recipe `puppet:install` and hook it to run before `deploy:finalize_update`.  
 
 ### What it does
